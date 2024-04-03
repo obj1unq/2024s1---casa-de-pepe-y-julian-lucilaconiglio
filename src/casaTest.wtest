@@ -1,0 +1,40 @@
+import casa.*
+
+test "Romper algo de 1000 pesos, hay viveres suficientes" {
+
+	casaDePepeYJulian.romperAlgo(1000)
+	assert.equals(true, casaDePepeYJulian.hayViveresSuficientes())
+	assert.equals(false, casaDePepeYJulian.laCasaEstaEnOrden())
+}
+
+test "costo de operacion 20 pesos en cuenta de gastos vacia, se deposita 1000" {
+
+	cuentaDeGastos.costoPorOperacion(20)
+	cuentaDeGastos.depositar(1000)
+	assert.equals(980, cuentaDeGastos.saldo())
+}
+
+test "depositar y extraer de cuenta combinada, el costo de operacion es de 50 pesos"{
+	
+	cuentaDeGastos.costoPorOperacion(50)
+	cuentaCombinada.depositar(100)
+	cuentaCombinada.extraer(200)
+	assert.equals(50, cuentaDeGastos.saldo())
+	assert.equals(300, cuentaCorriente.saldo())
+	assert.equals(350, cuentaCombinada.saldo())
+}
+
+test "hacer mantenimiento con estrategia de ahorro full"{
+	casaDePepeYJulian.porcentajeDeViveres(50)
+	casaDePepeYJulian.romperAlgo(100)
+	casaDePepeYJulian.cuentaAsignada(cuentaCorriente)
+	casaDePepeYJulian.depositar(500)
+	assert.equals(1000, casaDePepeYJulian.saldo())
+	casaDePepeYJulian.estrategiaDeAhorro(full)
+	casaDePepeYJulian.hacerMantenimiento()
+	assert.equals(90, casaDePepeYJulian.porcentajeDeViveres())
+	assert.equals(100, casaDePepeYJulian.montoParaReparaciones())
+	assert.equals(800, cuentaCorriente.saldo())
+}
+
+
