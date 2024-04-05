@@ -5,18 +5,22 @@ object casaDePepeYJulian {
 	var property cuentaAsignada = cuentaCombinada
 	var property estrategiaDeAhorro = minimoEIndispesable
 
-	method montoParaReparaciones(){
+	method hayQueHacerReparaciones() {
+		return montoParaReparaciones > 0
+	}
+
+	method montoParaReparaciones() {
 		return montoParaReparaciones
 	}
-	
+
 	method hayViveresSuficientes() {
 		return porcentajeDeViveres > 40
 	}
-	
-	method porcentajeDeViveres(){
+
+	method porcentajeDeViveres() {
 		return porcentajeDeViveres
 	}
-	
+
 	method laCasaEstaEnOrden() {
 		return self.hayViveresSuficientes() && !self.hayQueHacerReparaciones()
 	}
@@ -24,15 +28,7 @@ object casaDePepeYJulian {
 	method romperAlgo(valor) {
 		montoParaReparaciones += valor
 	}
-	
-	method hacerReparacion(){
-		montoParaReparaciones = 0
-	}
 
-	method hayQueHacerReparaciones(){
-		return montoParaReparaciones > 0
-	}
-	
 	method depositar(cantidad) {
 		cuentaAsignada.depositar(cantidad)
 	}
@@ -44,13 +40,24 @@ object casaDePepeYJulian {
 	method saldo() {
 		return cuentaAsignada.saldo()
 	}
-	
-	method generarGasto(cantidad){
+
+	method generarGasto(cantidad) {
 		self.extraer(cantidad)
 	}
-	
-	method hacerMantenimiento(){
+
+	method hacerMantenimiento() {
 		estrategiaDeAhorro.hacerMantenimiento(self)
+	}
+
+	method alcanzaParaReparar() {
+		return self.hayQueHacerReparaciones() && self.saldo() > (self.montoParaReparaciones() + 1000)
+	}
+
+	method reparar() {
+		if (self.alcanzaParaReparar()) {
+			self.generarGasto(montoParaReparaciones)
+			montoParaReparaciones = 0
+		}
 	}
 
 }
@@ -115,50 +122,43 @@ object cuentaCombinada {
 
 }
 
-object minimoEIndispesable{
-	
+object minimoEIndispesable {
+
 	var property calidad = 1
-	
-	method gastoDeViveres(porcentajeAComprar){
+
+	method gastoDeViveres(porcentajeAComprar) {
 		return porcentajeAComprar * calidad
 	}
-	
-	method hacerMantenimiento(casa){
-		if(!casa.hayViveresSuficientes()){
+
+	method hacerMantenimiento(casa) {
+		if (!casa.hayViveresSuficientes()) {
 			const valor = (40 - casa.porcentajeDeViveres()).max(0)
 			casa.generarGasto(self.gastoDeViveres(valor))
 			casa.porcentajeDeViveres(40)
 		}
 	}
-	
 
 }
 
-object full{
-	
+object full {
+
 	const calidad = 5
-	
-	method gastoDeViveres(porcentajeAComprar){
+
+	method gastoDeViveres(porcentajeAComprar) {
 		return porcentajeAComprar * calidad
 	}
-	
-	method hacerMantenimiento(casa){
-		if(casa.laCasaEstaEnOrden()){
+
+	method hacerMantenimiento(casa) {
+		if (casa.laCasaEstaEnOrden()) {
 			const valor = 100 - casa.porcentajeDeViveres()
 			casa.generarGasto(self.gastoDeViveres(valor))
 			casa.porcentajeDeViveres(100)
-		}else{
+		} else {
 			casa.generarGasto(self.gastoDeViveres(40))
 			casa.porcentajeDeViveres(casa.porcentajeDeViveres() + 40)
 		}
-		self.hacerReparacionesSiAlcanza(casa)
+		casa.reparar()
 	}
-	
-	method hacerReparacionesSiAlcanza(casa){
-		if(casa.hayQueHacerReparaciones() && casa.saldo() > (casa.montoParaReparaciones() + 1000)){
-			casa.generarGasto(casa.montoParaReparaciones())
-			casa.hacerReparacion()
-		}
-	}
+
 }
 
